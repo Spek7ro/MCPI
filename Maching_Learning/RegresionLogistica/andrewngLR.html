@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Regresión Logística — Presentación detallada con LaTeX y visuales</title>
+
+<!-- MathJax: renderiza LaTeX -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['\\(','\\)'], ['$', '$']],
+    displayMath: [['\\[','\\]'], ['$$','$$']],
+    processEscapes: true,
+    tags: 'none'
+  },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+};
+</script>
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<style>
+:root{
+  --bg:#0e1320;--panel:#151a33;--card:#1a2142;--text:#eef1ff;--muted:#a6aed0;
+  --pri:#78a6ff;--pri2:#9dd0ff;--acc:#66e2a7;--warn:#ffb86c;--border:#2c3566;
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --sans: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:radial-gradient(1100px 600px at 80% -10%, rgba(120,166,255,.15), transparent 60%),var(--bg);color:var(--text);font-family:var(--sans)}
+header{position:fixed;inset:0 0 auto 0;z-index:50;backdrop-filter:blur(10px);
+  background:linear-gradient(180deg, rgba(14,19,32,.9), rgba(14,19,32,.7) 70%, transparent);border-bottom:1px solid var(--border)}
+.wrap{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.logo{width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,var(--pri),var(--pri2))}
+h1{font-size:16px;margin:0}
+.pill{display:inline-block;padding:4px 10px;border:1px solid var(--border);border-radius:999px;font-size:12px;color:var(--muted)}
+.progress{margin-left:auto;display:flex;align-items:center;gap:8px}
+.bar{width:260px;height:6px;background:#0a0f24;border:1px solid var(--border);border-radius:999px;overflow:hidden}
+.bar>span{display:block;height:100%;background:linear-gradient(90deg,var(--pri),var(--pri2));width:0%}
+
+main{height:100vh;display:grid;place-items:center;padding:60px 12px 90px}
+.stage{width:min(1100px,95vw);height:min(78vh,820px);border:1px solid var(--border);border-radius:18px;
+  box-shadow:0 30px 60px rgba(0,0,0,.35);background:linear-gradient(180deg,var(--card),#13183a 160%);padding:20px;overflow:hidden;position:relative}
+.slide{position:absolute;inset:0;display:none;padding:18px;overflow:auto}
+.slide.active{display:block;animation:fade .28s ease}
+@keyframes fade{from{opacity:.4;transform:translateY(6px)} to{opacity:1;transform:none}}
+.title{font-size:26px;margin:0 0 6px}
+.muted{color:var(--muted)}
+.two{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+.three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media (max-width:980px){ .two{grid-template-columns:1fr} .three{grid-template-columns:1fr} }
+.card{border:1px solid var(--border);border-radius:16px;padding:14px;background:linear-gradient(180deg,#1a2146,#141a38)}
+.table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.table th,.table td{border-bottom:1px solid var(--border);padding:6px 8px;text-align:left}
+.table th{color:#c7d4ff}
+.kbd{font-family:var(--mono);border:1px solid var(--border);border-radius:8px;padding:0 6px;font-size:12px;color:var(--muted)}
+.hint{color:var(--muted);font-size:12px}
+input[type="range"]{width:100%}
+button,select{font-family:var(--sans)}
+canvas{width:100%;height:320px;border-radius:14px;border:1px solid var(--border);background:#0b0f24}
+.caption{font-size:13px;color:#cbd2ff;margin-top:6px}
+ul li{margin:6px 0}
+footer{position:fixed;inset:auto 0 0 0;z-index:40;border-top:1px solid var(--border);
+  background:linear-gradient(0deg, rgba(14,19,32,.9), rgba(14,19,32,.7) 70%, transparent);padding:10px 12px}
+.nav{max-width:1100px;margin:0 auto;display:flex;gap:10px;align-items:center;justify-content:space-between}
+.btn{border:1px solid var(--border);background:linear-gradient(180deg,var(--panel),#12162e);color:var(--text);
+  padding:10px 14px;border-radius:12px;cursor:pointer;font-weight:700;font-size:14px;transition:.25s transform,.25s background;box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.btn:hover{transform:translateY(-1px);background:linear-gradient(180deg,#1c2350,#121733)}
+.btn.primary{border-color:transparent;background:linear-gradient(180deg,var(--pri),#4f7eea);color:#0b1022}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="logo"></div><h1>Regresión Logística — Slides interactivas (fórmulas detalladas)</h1>
+      <span class="pill">LaTeX • Visuales • Paso a paso</span>
+    </div>
+    <div class="progress">
+      <div class="hint">Slide <span id="curSlide">1</span>/<span id="totSlides">—</span></div>
+      <div class="bar"><span id="barfill"></span></div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="stage" id="stage">
+
+    <!-- 1 Portada -->
+    <section class="slide active" data-title="Portada">
+      <h2 class="title">Agenda y objetivos</h2>
+      <div class="two">
+        <div class="card">
+          <p>Clasificamos \(y\in\{0,1\}\) modelando \(p(y=1\mid x)\) con la función sigmoide aplicada a un score lineal.</p>
+          <div>
+            \[
+              h_\theta(x)=g(\theta^\top x),\qquad g(z)=\frac{1}{1+e^{-z}}
+            \]
+          </div>
+          <p class="muted">Iremos de la hipótesis a la función de coste, su gradiente (vectorizado), GD vs Newton/IRLS, regla de decisión y multiclase OvA; con visualizaciones e interpretaciones.</p>
+        </div>
+        <div class="card">
+          <ol style="margin:0 0 8px 18px">
+            <li>Hipótesis y sigmoide</li>
+            <li>Logit y odds</li>
+            <li>Decisión y frontera</li>
+            <li>Verosimilitud \(\rightarrow\) coste</li>
+            <li>Gradiente (derivación y vectorización)</li>
+            <li>GD: curva de pérdida</li>
+            <li>Newton/IRLS: Hessiano</li>
+            <li>OvA multiclase</li>
+            <li>Ejemplo e interpretación de visuales</li>
+          </ol>
+          <p class="muted">Usa <span class="kbd">←</span>/<span class="kbd">→</span> o los botones.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 Hipótesis: definición -->
+    <section class="slide" data-title="Hipotesis1">
+      <h2 class="title">Hipótesis logística: definición</h2>
+      <div class="two">
+        <div class="card">
+          <p>La salida del modelo es una probabilidad:</p>
+          <div>
+            \[
+              h_\theta(x)=\mathbb{P}(y=1\mid x;\theta)=\frac{1}{1+e^{-\theta^\top x}}
+            \]
+          </div>
+          <ul>
+            <li>\(\theta^\top x=b+\sum_{j=1}^n \theta_j x_j\) (incluye sesgo \(b\) con \(x_0=1\)).</li>
+            <li>Rango: \(h_\theta(x)\in(0,1)\).</li>
+            <li>Monótona: si \(\theta^\top x\) crece, la probabilidad aumenta.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <canvas id="sig_canvas"></canvas>
+          <div class="caption">La curva sigmoide ilustra cómo el score \(z=\theta^\top x\) se transforma en probabilidad.</div>
+          <div class="row" style="margin-top:8px">
+            <label>Desplazamiento \(b\)</label><input type="range" id="sig_b" min="-3" max="3" step="0.05" value="0"/><span class="kbd" id="sig_b_v">0.00</span>
+          </div>
+          <div class="row"><label>Escala \(a\)</label><input type="range" id="sig_a" min="0.5" max="4" step="0.05" value="1.5"/><span class="kbd" id="sig_a_v">1.50</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3 Hipótesis: propiedades y cálculo -->
+    <section class="slide" data-title="Hipotesis2">
+      <h2 class="title">Sigmoide: propiedades y cálculo</h2>
+      <div class="two">
+        <div class="card">
+          <ul>
+            <li><b>Punto medio:</b> \(g(0)=0.5\).</li>
+            <li><b>Simetría:</b> \(g(-z)=1-g(z)\).</li>
+            <li><b>Derivada:</b> \(g'(z)=g(z)\,(1-g(z))\) (clave en el gradiente).</li>
+            <li><b>Cálculo numérico:</b> para evitar overflow, usa reformulaciones si \(|z|\) es grande.</li>
+          </ul>
+          <p><b>Ejemplo numérico:</b> si \(z=2\Rightarrow g(2)=1/(1+e^{-2})\approx 0.881\).</p>
+        </div>
+        <div class="card">
+          <table class="table">
+            <thead><tr><th>z</th><th>\(g(z)\)</th><th>Interpretación</th></tr></thead>
+            <tbody>
+              <tr><td>-3</td><td>\(\approx 0.047\)</td><td>Baja prob. de clase 1</td></tr>
+              <tr><td>0</td><td>0.5</td><td>Indiferente (umbral típico)</td></tr>
+              <tr><td>3</td><td>\(\approx 0.953\)</td><td>Alta prob. de clase 1</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 Logit/Odds -->
+    <section class="slide" data-title="LogitOdds">
+      <h2 class="title">Logit y odds: linealidad en el logit</h2>
+      <div class="two">
+        <div class="card">
+          <p>Definimos <b>odds</b> y <b>logit</b>:</p>
+          <div>
+            \[
+              \text{odds}=\frac{h}{1-h},\qquad \text{logit}(h)=\log\frac{h}{1-h}=\theta^\top x
+            \]
+          </div>
+          <ul>
+            <li>La logística es lineal en el logit: un incremento \(\Delta x_j\) produce un cambio aditivo \(\theta_j\Delta x_j\) en el logit.</li>
+            <li>\(e^{\theta_j}\) es el factor multiplicativo de las odds si \(x_j\) aumenta una unidad.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <p class="caption">Interpretación visual: mover un punto en el eje de la feature con \(\theta_j>0\) lo empuja a odds mayores.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5 Decisión y frontera -->
+    <section class="slide" data-title="Decision">
+      <h2 class="title">Regla de decisión y frontera lineal</h2>
+      <div class="two">
+        <div class="card">
+          <p>Con umbral \(\tau=0.5\):</p>
+          <div>
+            \[
+              \hat y=\mathbb{1}[\,h_\theta(x)\ge 0.5\,]\;\Longleftrightarrow\;\theta^\top x\ge 0
+            \]
+          </div>
+          <ul>
+            <li>En 2D, \(\theta^\top x=0\) es una recta (la <i>frontera de decisión</i>).</li>
+            <li>Si cambias \(\tau\), trasladas el criterio de corte (no la frontera geométrica).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <canvas id="db_canvas"></canvas>
+          <div class="caption">Línea azul = \(\theta^\top x=0\). El entrenamiento mueve la recta para separar clases.</div>
+          <div class="row"><button class="btn primary" id="db_train">Entrenar GD</button><button class="btn" id="db_reset">Reiniciar</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 Likelihood -> Coste -->
+    <section class="slide" data-title="Coste1">
+      <h2 class="title">De la verosimilitud al coste (log-loss)</h2>
+      <div class="two">
+        <div class="card">
+          <p>Verosimilitud de datos i.i.d. \((x^{(i)},y^{(i)})\):</p>
+          <div>
+            \[
+              \mathcal{L}(\theta)=\prod_{i=1}^m \big(h_\theta(x^{(i)})\big)^{y^{(i)}}
+              \big(1-h_\theta(x^{(i)})\big)^{1-y^{(i)}}
+            \]
+          </div>
+          <p>Log-verosimilitud:</p>
+          <div>
+            \[
+              \ell(\theta)=\sum_{i=1}^m \Big( y^{(i)}\log h_\theta(x^{(i)})+(1-y^{(i)})\log(1-h_\theta(x^{(i)}))\Big)
+            \]
+          </div>
+          <p>Coste (a minimizar): \(J(\theta)=-\frac{1}{m}\,\ell(\theta)\).</p>
+        </div>
+        <div class="card">
+          <ul>
+            <li>La log-loss penaliza fuertemente alta confianza en la clase incorrecta.</li>
+            <li>Es convexa en \(\theta\) (para la logística), lo que facilita optimización.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 Coste: cálculo y ejemplo -->
+    <section class="slide" data-title="Coste2">
+      <h2 class="title">Coste: cálculo numérico e intuición</h2>
+      <div class="two">
+        <div class="card">
+          <p>Para un ejemplo con \(m=3\):</p>
+          <div>
+            \[
+              J(\theta)=-\tfrac{1}{3}\sum_{i=1}^3 \Big( y^{(i)}\log h^{(i)} + (1-y^{(i)})\log(1-h^{(i)}) \Big)
+            \]
+          </div>
+          <p>Si el modelo acierta con alta \(h^{(i)}\), la contribución al coste es pequeña; si se equivoca con confianza, es grande.</p>
+        </div>
+        <div class="card">
+          <table class="table">
+            <thead><tr><th>i</th><th>\(y^{(i)}\)</th><th>\(h^{(i)}\)</th><th>término</th></tr></thead>
+            <tbody>
+              <tr><td>1</td><td>1</td><td>0.92</td><td>\(-\log 0.92\)</td></tr>
+              <tr><td>2</td><td>0</td><td>0.85</td><td>\(-\log(1-0.85)\)</td></tr>
+              <tr><td>3</td><td>1</td><td>0.51</td><td>\(-\log 0.51\)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 Gradiente: derivación -->
+    <section class="slide" data-title="Grad1">
+      <h2 class="title">Gradiente: derivación escalar</h2>
+      <div class="two">
+        <div class="card">
+          <p>Usando \(h^{(i)}=g(\theta^\top x^{(i)})\) y \(g'(z)=g(z)(1-g(z))\):</p>
+          <div>
+            \[
+              \frac{\partial J}{\partial \theta_j}
+              =\frac{1}{m}\sum_{i=1}^m \big(h^{(i)}-y^{(i)}\big)\,x_j^{(i)}
+            \]
+          </div>
+          <p>El término \((h^{(i)}-y^{(i)})\) es el “error probabilístico” de cada ejemplo.</p>
+        </div>
+        <div class="card">
+          <ul>
+            <li>Si \(h^{(i)}\gt y^{(i)}\), el gradiente empuja \(\theta\) a reducir \(h\).</li>
+            <li>Si \(h^{(i)}\lt y^{(i)}\), empuja a aumentarlo.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 Gradiente: forma vectorizada -->
+    <section class="slide" data-title="Grad2">
+      <h2 class="title">Gradiente: forma vectorizada y dimensiones</h2>
+      <div class="two">
+        <div class="card">
+          <div>
+            \[
+              \nabla J(\theta)=\frac{1}{m}X^\top\big(h-y\big),\quad
+              h=g(X\theta)
+            \]
+          </div>
+          <ul>
+            <li>\(X\in\mathbb{R}^{m\times n}\), \(\theta\in\mathbb{R}^{n}\), \(h,y\in\mathbb{R}^{m}\).</li>
+            <li>Actualización GD: \(\theta:=\theta-\alpha \nabla J(\theta)\).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <canvas id="loss_canvas"></canvas>
+          <div class="caption">Curva de pérdida \(J(\theta)\) vs iteraciones para distintos \(\alpha\).</div>
+          <div class="row" style="margin-top:8px">
+            <label>\(\alpha\) (learning rate)</label><input id="gd_lr" type="range" min="0.01" max="1.0" step="0.01" value="0.1"/><span class="kbd" id="gd_lr_v">0.10</span>
+          </div>
+          <div class="row"><button class="btn primary" id="gd_run">Descenso por gradiente</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 GD: interpretación del visual -->
+    <section class="slide" data-title="GDviz">
+      <h2 class="title">Cómo leer la curva de pérdida</h2>
+      <div class="two">
+        <div class="card">
+          <ul>
+            <li>Descenso suave: \(\alpha\) razonable.</li>
+            <li>Serpenteo/oscila: \(\alpha\) grande.</li>
+            <li>Estancamiento: \(\alpha\) pequeño o datos poco separables.</li>
+          </ul>
+          <p>Consejo: prueba varios \(\alpha\), observa estabilidad y velocidad.</p>
+        </div>
+        <div class="card">
+          <p class="caption">Vuelve a la slide anterior, cambia \(\alpha\) y compara la forma de la curva.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 Newton/IRLS -->
+    <section class="slide" data-title="Newton1">
+      <h2 class="title">Newton / IRLS: Hessiano y actualización</h2>
+      <div class="two">
+        <div class="card">
+          <div>
+            \[
+              \theta := \theta - H^{-1}\nabla J,\quad
+              H=\frac{1}{m}X^\top R X,\quad R=\operatorname{diag}(h\circ(1-h))
+            \]
+          </div>
+          <ul>
+            <li>\(R\) pondera cada ejemplo por su varianza \(h(1-h)\).</li>
+            <li>Rápida convergencia, mayor costo (invertir \(H\)).</li>
+          </ul>
+        </div>
+        <div class="card">
+          <canvas id="opt_canvas"></canvas>
+          <div class="caption">Comparación conceptual: GD (verde) vs Newton (azul) en iteraciones.</div>
+          <div class="row"><button class="btn primary" id="opt_compare">GD vs Newton (demo)</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 OvA multiclase -->
+    <section class="slide" data-title="OvA1">
+      <h2 class="title">Multiclase con One-vs-All (OvA)</h2>
+      <div class="two">
+        <div class="card">
+          <p>Para \(K\) clases, entrenamos \(K\) clasificadores binarios:</p>
+          <div>
+            \[
+              h^{(k)}(x)=g\!\big((\theta^{(k)})^\top x\big),\qquad
+              \hat y=\arg\max_k h^{(k)}(x)
+            \]
+          </div>
+          <ul>
+            <li>Cada clasificador decide “clase \(k\) vs resto”.</li>
+            <li>Predicción: el \(k\) con mayor probabilidad.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <canvas id="ova_canvas"></canvas>
+          <div class="caption">Regiones por voto OvA. Los puntos heredan el color de su clase.</div>
+          <div class="row"><button class="btn primary" id="ova_train">Entrenar 3 clases (OvA)</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13 Interpretación de cada visual -->
+    <section class="slide" data-title="Interpretacion">
+      <h2 class="title">Guía de interpretación de visualizaciones</h2>
+      <div class="two">
+        <div class="card">
+          <ul>
+            <li><b>Sigmoide:</b> relación score-probabilidad; juega con \(a,b\) para ver pendiente y offset.</li>
+            <li><b>Frontera:</b> línea donde \(\theta^\top x=0\); mira cuántos puntos quedan mal clasificados.</li>
+            <li><b>Curva de pérdida GD:</b> caída monótona indica optimización estable.</li>
+            <li><b>GD vs Newton:</b> Newton necesita menos pasos, pero cada paso es más costoso.</li>
+            <li><b>OvA:</b> revisa solapes entre regiones de clase y errores en los bordes.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <p class="muted">Sugerencia didáctica: alterna entre slides para enlazar fórmula ↔ visual y reforzar el “por qué” de cada ecuación.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 Mini ejemplo (numérico) -->
+    <section class="slide" data-title="Ejemplo">
+      <h2 class="title">Mini ejemplo numérico (2 features)</h2>
+      <div class="two">
+        <div class="card">
+          <p>Sea \(\theta=[b,w_1,w_2]=[-1,\,0.8,\,1.2]\) y \(x=[1,\,x_1,\,x_2]=[1,\,0.5,\,1.0]\):</p>
+          <div>
+            \[
+              z=\theta^\top x=-1+0.8(0.5)+1.2(1)= -1+0.4+1.2=0.6,\qquad
+              h=g(0.6)=\frac{1}{1+e^{-0.6}}\approx 0.646
+            \]
+          </div>
+          <p>Interpretación: probabilidad de clase 1 ≈ 64.6%; con \(\tau=0.5\) predecimos 1.</p>
+        </div>
+        <div class="card">
+          <table class="table">
+            <thead><tr><th>Elemento</th><th>Valor</th></tr></thead>
+            <tbody>
+              <tr><td>\(z\)</td><td>0.6</td></tr>
+              <tr><td>\(h\)</td><td>0.646</td></tr>
+              <tr><td>\(\text{odds}=h/(1-h)\)</td><td>\(\approx 1.83\)</td></tr>
+              <tr><td>\(\log\text{odds}\)</td><td>\(\log 1.83 \approx 0.603 \approx z\)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 Cierre -->
+    <section class="slide" data-title="Cierre">
+      <h2 class="title">Resumen y próximos pasos</h2>
+      <div class="two">
+        <div class="card">
+          <ul>
+            <li>\(h(x)=g(\theta^\top x)\), lineal en el logit, probabilística en salida.</li>
+            <li>Coste logístico (convexo) \(\Rightarrow\) \(\nabla J=(1/m)X^\top(h-y)\).</li>
+            <li>GD vs Newton/IRLS: trade-off costo/iteraciones.</li>
+            <li>OvA extiende a multiclase con bloques binarios.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <p class="muted">Puedes extender con regularización (L2/L1), calibración y manejo de desbalance como módulos adicionales.</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="nav">
+    <button class="btn" id="prevBtn">← Atrás</button>
+    <div class="hint">Atajos: <span class="kbd">←</span>/<span class="kbd">→</span>, <span class="kbd">Home</span>, <span class="kbd">End</span></div>
+    <button class="btn primary" id="nextBtn">Siguiente →</button>
+  </div>
+</footer>
+
+<script>
+/* ======= Navegación ======= */
+const slides=[...document.querySelectorAll(".slide")];
+const curEl=document.getElementById("curSlide");
+const totEl=document.getElementById("totSlides");
+const bar=document.getElementById("barfill");
+const prevBtn=document.getElementById("prevBtn");
+const nextBtn=document.getElementById("nextBtn");
+let idx=0; totEl.textContent=slides.length;
+function show(i){
+  idx=Math.max(0,Math.min(slides.length-1,i));
+  slides.forEach((s,k)=>s.classList.toggle("active",k===idx));
+  curEl.textContent=(idx+1); bar.style.width=((idx)/(slides.length-1))*100+"%";
+  prevBtn.disabled=(idx===0); nextBtn.disabled=(idx===slides.length-1);
+  const t=slides[idx].dataset.title;
+  if(t==="Hipotesis1") initSigOnce();
+  if(t==="Decision") initDBOnce();
+  if(t==="Grad2") initLossOnce();
+  if(t==="Newton1") initOptOnce();
+  if(t==="OvA1") initOvaOnce();
+  // Re-render de fórmulas en la slide visible
+  if(window.MathJax && MathJax.typesetPromise){ MathJax.typesetPromise([slides[idx]]); }
+}
+prevBtn.onclick=()=>show(idx-1);
+nextBtn.onclick=()=>show(idx+1);
+window.addEventListener("keydown",(e)=>{
+  if(e.key==="ArrowRight") show(idx+1);
+  else if(e.key==="ArrowLeft") show(idx-1);
+  else if(e.key==="Home") show(0);
+  else if(e.key==="End") show(slides.length-1);
+});
+show(0);
+
+/* ======= Utilidades ======= */
+function setupCanvas(cnv, baseH=320){
+  const ctx=cnv.getContext("2d");
+  function resize(){ const r=cnv.getBoundingClientRect(); cnv.width=Math.floor(r.width*2); cnv.height=Math.floor(baseH*2); ctx.setTransform(1,0,0,1,0,0); ctx.scale(2,2); }
+  resize(); window.addEventListener("resize",resize,{passive:true}); return ctx;
+}
+function randn(){ let u=0,v=0; while(u===0) u=Math.random(); while(v===0) v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+const sig=z=>1/(1+Math.exp(-z));
+function mapv(v,a,b,A,B){ return A+(v-a)*(B-A)/(b-a); }
+
+/* ======= Slide Sigmoide ======= */
+let sigInit=false;
+function initSigOnce(){ if(sigInit) return; sigInit=true; initSig(); }
+function initSig(){
+  const cnv=document.getElementById("sig_canvas"); const ctx=setupCanvas(cnv,320);
+  const a=document.getElementById("sig_a"), b=document.getElementById("sig_b");
+  const a_v=document.getElementById("sig_a_v"), b_v=document.getElementById("sig_b_v");
+  function draw(){
+    const W=cnv.clientWidth, H=cnv.clientHeight, pad=30;
+    ctx.clearRect(0,0,W,H); ctx.fillStyle="#0b0f24"; ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle="#2a3263"; ctx.strokeRect(pad,pad,W-2*pad,H-2*pad);
+    ctx.strokeStyle="#38427a"; ctx.beginPath(); ctx.moveTo(pad,H/2); ctx.lineTo(W-pad,H/2); ctx.moveTo(W/2,pad); ctx.lineTo(W/2,H-pad); ctx.stroke();
+    ctx.beginPath();
+    for(let i=0;i<=220;i++){
+      const x=mapv(i,0,220,-6,6);
+      const y=sig(+a.value*(x-+b.value));
+      const X=mapv(x,-6,6,pad,W-pad), Y=mapv(y,0,1,H-pad,pad);
+      if(i===0) ctx.moveTo(X,Y); else ctx.lineTo(X,Y);
+    }
+    ctx.strokeStyle="#8fc2ff"; ctx.lineWidth=2; ctx.stroke();
+  }
+  a.oninput=()=>{ a_v.textContent=(+a.value).toFixed(2); draw(); };
+  b.oninput=()=>{ b_v.textContent=(+b.value).toFixed(2); draw(); };
+  a_v.textContent=(+a.value).toFixed(2); b_v.textContent=(+b.value).toFixed(2); draw();
+}
+
+/* ======= Slide Frontera (GD simple) ======= */
+let dbInit=false;
+function initDBOnce(){ if(dbInit) return; dbInit=true; initDB(); }
+function initDB(){
+  const cnv=document.getElementById("db_canvas"); const ctx=setupCanvas(cnv,320);
+  const btnT=document.getElementById("db_train"), btnR=document.getElementById("db_reset");
+  let data=[], theta=[0,0,0]; // [b,w1,w2]
+  function makeData(){
+    data=[];
+    for(let i=0;i<50;i++) data.push({x:[-2.3+randn()*1.0,-2+randn()*1.0], y:0});
+    for(let i=0;i<50;i++) data.push({x:[ 2.2+randn()*1.0,  2+randn()*1.0], y:1});
+  }
+  makeData();
+  function bounds(){ let xmn=Infinity,xmx=-Infinity,ymn=Infinity,ymx=-Infinity; for(const p of data){ xmn=Math.min(xmn,p.x[0]); xmx=Math.max(xmx,p.x[0]); ymn=Math.min(ymn,p.x[1]); ymx=Math.max(ymx,p.x[1]); } return [xmn,xmx,ymn,ymx]; }
+  function draw(){
+    const W=cnv.clientWidth,H=cnv.clientHeight; ctx.clearRect(0,0,W,H);
+    const [xmn,xmx,ymn,ymx]=bounds(); const pad=12; const toX=x=>mapv(x,xmn,xmx,pad,W-pad), toY=y=>mapv(y,ymx,ymn,pad,H-pad);
+    // puntos
+    for(const p of data){ ctx.beginPath(); ctx.arc(toX(p.x[0]),toY(p.x[1]),6,0,Math.PI*2); ctx.fillStyle=p.y?"#66e2a7":"#78a6ff"; ctx.fill(); }
+    // frontera
+    if(Math.abs(theta[2])>1e-9){ ctx.beginPath(); const xA=xmn,xB=xmx; const yA=-(theta[0]+theta[1]*xA)/theta[2], yB=-(theta[0]+theta[1]*xB)/theta[2]; ctx.moveTo(toX(xA),toY(yA)); ctx.lineTo(toX(xB),toY(yB)); ctx.strokeStyle="#9dd0ff"; ctx.lineWidth=2; ctx.stroke(); }
+  }
+  function trainGD(){
+    theta=[0,0,0]; const alpha=0.2, iters=800;
+    for(let t=0;t<iters;t++){
+      let g=[0,0,0];
+      for(const p of data){ const z=theta[0]+theta[1]*p.x[0]+theta[2]*p.x[1]; const h=sig(z); const d=(h-p.y); g[0]+=d; g[1]+=d*p.x[0]; g[2]+=d*p.x[1]; }
+      g=g.map(v=>v/data.length); theta[0]-=alpha*g[0]; theta[1]-=alpha*g[1]; theta[2]-=alpha*g[2];
+    }
+    draw();
+  }
+  btnT.onclick=trainGD; btnR.onclick=()=>{ makeData(); theta=[0,0,0]; draw(); };
+  draw();
+}
+
+/* ======= Slide GD: curva de pérdida ======= */
+let lossInit=false;
+function initLossOnce(){ if(lossInit) return; lossInit=true; initLoss(); }
+function initLoss(){
+  const cnv=document.getElementById("loss_canvas"); const ctx=setupCanvas(cnv,320);
+  const run=document.getElementById("gd_run"); const lr=document.getElementById("gd_lr"); const lr_v=document.getElementById("gd_lr_v"); lr_v.textContent=(+lr.value).toFixed(2);
+  function makeData(){ const D=[]; for(let i=0;i<60;i++) D.push({x:[-2.2+randn()*1.1,-2+randn()*1.1],y:0}); for(let i=0;i<60;i++) D.push({x:[ 2.1+randn()*1.1,  2+randn()*1.1],y:1}); return D; }
+  function loss(D,th){ let L=0,eps=1e-12; for(const p of D){ const h=Math.min(Math.max(sig(th[0]+th[1]*p.x[0]+th[2]*p.x[1]),eps),1-eps); L+=-(p.y*Math.log(h)+(1-p.y)*Math.log(1-h)); } return L/D.length; }
+  function drawHist(hist){
+    const W=cnv.clientWidth,H=cnv.clientHeight,pad=30; const ymin=Math.min(...hist), ymax=Math.max(...hist);
+    const toX=t=>pad+(t/(hist.length-1))*(W-2*pad), toY=v=>pad+(1-(v-ymin)/(ymax-ymin+1e-9))*(H-2*pad);
+    ctx.clearRect(0,0,W,H); ctx.fillStyle="#0b0f24"; ctx.fillRect(0,0,W,H); ctx.strokeStyle="#2a3263"; ctx.strokeRect(pad,pad,W-2*pad,H-2*pad);
+    ctx.beginPath(); for(let t=0;t<hist.length;t++){ const x=toX(t), y=toY(hist[t]); if(t===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);} ctx.strokeStyle="#66e2a7"; ctx.lineWidth=2; ctx.stroke();
+  }
+  run.onclick=()=>{
+    const D=makeData(); let th=[0,0,0], hist=[], alpha=parseFloat(lr.value); const steps=120;
+    for(let s=0;s<steps;s++){
+      let g=[0,0,0];
+      for(const p of D){ const z=th[0]+th[1]*p.x[0]+th[2]*p.x[1]; const h=sig(z); const d=(h-p.y); g[0]+=d; g[1]+=d*p.x[0]; g[2]+=d*p.x[1]; }
+      g=g.map(v=>v/D.length); th[0]-=alpha*g[0]; th[1]-=alpha*g[1]; th[2]-=alpha*g[2];
+      hist.push(loss(D,th));
+    }
+    drawHist(hist);
+  };
+  lr.oninput=()=>lr_v.textContent=(+lr.value).toFixed(2);
+}
+
+/* ======= Slide Newton vs GD ======= */
+let optInit=false;
+function initOptOnce(){ if(optInit) return; optInit=true; initOpt(); }
+function initOpt(){
+  const cnv=document.getElementById("opt_canvas"); const ctx=setupCanvas(cnv,320);
+  const btn=document.getElementById("opt_compare");
+  function makeData(){ const D=[]; for(let i=0;i<60;i++) D.push({x:[-2.1+randn()*1.1,-2+randn()*1.1],y:0}); for(let i=0;i<60;i++) D.push({x:[ 2.2+randn()*1.1,  2+randn()*1.1],y:1}); return D; }
+  function loss(D,th){ let L=0,eps=1e-12; for(const p of D){ const h=Math.min(Math.max(sig(th[0]+th[1]*p.x[0]+th[2]*p.x[1]),eps),1-eps); L+=-(p.y*Math.log(h)+(1-p.y)*Math.log(1-h)); } return L/D.length; }
+  function gdHist(D,steps=60,a=0.1){ let th=[0,0,0], hist=[]; for(let t=0;t<steps;t++){ let g=[0,0,0]; for(const p of D){ const z=th[0]+th[1]*p.x[0]+th[2]*p.x[1]; const h=sig(z); const d=(h-p.y); g[0]+=d; g[1]+=d*p.x[0]; g[2]+=d*p.x[1]; } g=g.map(v=>v/D.length); th[0]-=a*g[0]; th[1]-=a*g[1]; th[2]-=a*g[2]; hist.push(loss(D,th)); } return hist; }
+  function newtonHist(D,steps=8){ let th=[0,0,0], hist=[]; for(let t=0;t<steps;t++){ let g=[0,0,0], H=[[0,0,0],[0,0,0],[0,0,0]]; for(const p of D){ const x=[1,p.x[0],p.x[1]]; const z=th[0]+th[1]*p.x[0]+th[2]*p.x[1]; const h=sig(z); const r=h*(1-h); const d=(h-p.y); for(let i=0;i<3;i++){ g[i]+=d*x[i]; for(let j=0;j<3;j++){ H[i][j]+=r*x[i]*x[j]; } } } for(let i=0;i<3;i++){ g[i]/=D.length; for(let j=0;j<3;j++) H[i][j]/=D.length; }
+      const A=H; const det= A[0][0]*(A[1][1]*A[2][2]-A[1][2]*A[2][1]) - A[0][1]*(A[1][0]*A[2][2]-A[1][2]*A[2][0]) + A[0][2]*(A[1][0]*A[2][1]-A[1][1]*A[2][0]);
+      if(Math.abs(det)<1e-10) break;
+      const inv=[[(A[1][1]*A[2][2]-A[1][2]*A[2][1])/det,(A[0][2]*A[2][1]-A[0][1]*A[2][2])/det,(A[0][1]*A[1][2]-A[0][2]*A[1][1])/det],
+                 [(A[1][2]*A[2][0]-A[1][0]*A[2][2])/det,(A[0][0]*A[2][2]-A[0][2]*A[2][0])/det,(A[0][2]*A[1][0]-A[0][0]*A[1][2])/det],
+                 [(A[1][0]*A[2][1]-A[1][1]*A[2][0])/det,(A[0][1]*A[2][0]-A[0][0]*A[2][1])/det,(A[0][0]*A[1][1]-A[0][1]*A[1][0])/det]];
+      const dlt=[ inv[0][0]*g[0]+inv[0][1]*g[1]+inv[0][2]*g[2], inv[1][0]*g[0]+inv[1][1]*g[1]+inv[1][2]*g[2], inv[2][0]*g[0]+inv[2][1]*g[1]+inv[2][2]*g[2] ];
+      th[0]-=dlt[0]; th[1]-=dlt[1]; th[2]-=dlt[2]; hist.push(loss(D,th));
+    } return hist; }
+  function draw(gdH,nH){
+    const W=cnv.clientWidth,H=cnv.clientHeight,pad=30;
+    const all=gdH.concat(nH); const ymin=Math.min(...all), ymax=Math.max(...all);
+    const maxSteps=Math.max(gdH.length,nH.length);
+    const toX=t=>pad+(t/(maxSteps-1))*(W-2*pad), toY=v=>pad+(1-(v-ymin)/(ymax-ymin+1e-9))*(H-2*pad);
+    ctx.clearRect(0,0,W,H); ctx.fillStyle="#0b0f24"; ctx.fillRect(0,0,W,H); ctx.strokeStyle="#2a3263"; ctx.strokeRect(pad,pad,W-2*pad,H-2*pad);
+    function plot(hist,color){ ctx.beginPath(); for(let t=0;t<hist.length;t++){ const x=toX(t), y=toY(hist[t]); if(t===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); } ctx.strokeStyle=color; ctx.lineWidth=2; ctx.stroke(); }
+    plot(gdH,"#66e2a7"); plot(nH,"#9dd0ff");
+  }
+  btn.onclick=()=>{ const D=makeData(); draw(gdHist(D,60,0.12), newtonHist(D,8)); };
+}
+
+/* ======= Slide OvA ======= */
+let ovaInit=false;
+function initOvaOnce(){ if(ovaInit) return; ovaInit=true; initOvA(); }
+function initOvA(){
+  const cnv=document.getElementById("ova_canvas"); const ctx=setupCanvas(cnv,320);
+  const btn=document.getElementById("ova_train");
+  let D=[], TH=[[0,0,0],[0,0,0],[0,0,0]];
+  function makeData(){
+    D=[];
+    for(let i=0;i<70;i++) D.push({x:[-2+randn()*1.0,-2+randn()*1.0], y:0});
+    for(let i=0;i<70;i++) D.push({x:[ 2+randn()*1.0,-1+randn()*1.0], y:1});
+    for(let i=0;i<70;i++) D.push({x:[ 0+randn()*1.0,  2+randn()*1.0], y:2});
+  }
+  makeData();
+  function softmaxPick(zs){ const m=Math.max(...zs); const ez=zs.map(v=>Math.exp(v-m)); const s=ez.reduce((a,b)=>a+b,0); const p=ez.map(v=>v/s); let k=0; for(let i=1;i<p.length;i++) if(p[i]>p[k]) k=i; return k; }
+  function draw(){
+    const W=cnv.clientWidth,H=cnv.clientHeight; ctx.clearRect(0,0,W,H);
+    let xmn=Infinity,xmx=-Infinity,ymn=Infinity,ymx=-Infinity; for(const p of D){ xmn=Math.min(xmn,p.x[0]); xmx=Math.max(xmx,p.x[0]); ymn=Math.min(ymn,p.x[1]); ymx=Math.max(ymx,p.x[1]); }
+    const pad=12; const toX=x=>mapv(x,xmn,xmx,pad,W-pad), toY=y=>mapv(y,ymx,ymn,pad,H-pad);
+    const cols=90, rows=60;
+    for(let i=0;i<cols;i++) for(let j=0;j<rows;j++){
+      const x=mapv(i,0,cols-1,xmn,xmx), y=mapv(j,0,rows-1,ymn,ymx);
+      const z=[TH[0][0]+TH[0][1]*x+TH[0][2]*y, TH[1][0]+TH[1][1]*x+TH[1][2]*y, TH[2][0]+TH[2][1]*x+TH[2][2]*y];
+      const k=softmaxPick(z);
+      ctx.fillStyle= k===0?"rgba(120,166,255,.16)":(k===1?"rgba(102,226,167,.16)":"rgba(255,184,108,.16)");
+      ctx.fillRect(toX(x)-1,toY(y)-1,3,3);
+    }
+    for(const p of D){ ctx.beginPath(); ctx.arc(toX(p.x[0]),toY(p.x[1]),5.2,0,Math.PI*2); ctx.fillStyle= p.y===0?"#78a6ff":(p.y===1?"#66e2a7":"#ffb86c"); ctx.fill(); }
+  }
+  function train(){
+    TH=[[0,0,0],[0,0,0],[0,0,0]]; const iters=700, a=0.12;
+    for(let t=0;t<iters;t++){
+      let G=[[0,0,0],[0,0,0],[0,0,0]];
+      for(const p of D){
+        for(let k=0;k<3;k++){
+          const z=TH[k][0]+TH[k][1]*p.x[0]+TH[k][2]*p.x[1]; const h=sig(z); const yk=(p.y===k)?1:0; const d=(h-yk);
+          G[k][0]+=d; G[k][1]+=d*p.x[0]; G[k][2]+=d*p.x[1];
+        }
+      }
+      for(let k=0;k<3;k++){ for(let j=0;j<3;j++){ G[k][j]/=D.length; TH[k][j]-=a*G[k][j]; } }
+    }
+    draw();
+  }
+  btn.onclick=train; draw();
+}
+</script>
+</body>
+</html>
