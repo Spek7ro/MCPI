@@ -40,3 +40,15 @@ sd(AA) #40 <-+-1 35 - 45 <- 68% +-2 30 - 50 <-95% +-3 25 - 55 99.7%
 # sd pequeña → los datos están concentrados cerca de la media.
 # sd grande → los datos están muy dispersos.
 #######
+
+# Sesgo
+library(e1071)
+skewness(AO) # sesgo postitivo 
+boxplot(AO, horizontal = TRUE)
+
+skewness(AA)
+boxplot(AA, horizontal = TRUE)
+
+# Histogramas 
+hist(AO)
+hist(AA)
