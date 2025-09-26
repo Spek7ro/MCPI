@@ -4,21 +4,21 @@
     "type": "split",
     "children": [
       {
-        "id": "999a066d6064c792",
+        "id": "fab98b1d664159cc",
         "type": "tabs",
         "children": [
           {
-            "id": "015be5fff6d9bed8",
+            "id": "3ceac2fbf12f70d1",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Maching Learning/Regresión logística.md",
+                "file": "CursoTableau/Dimensiones y Medidas.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Regresión logística"
+              "title": "Dimensiones y Medidas"
             }
           }
         ]
@@ -169,8 +169,10 @@
       "command-palette:Abrir paleta de comandos": false
     }
   },
-  "active": "015be5fff6d9bed8",
+  "active": "3ceac2fbf12f70d1",
   "lastOpenFiles": [
+    "CursoTableau/Dimensiones y Medidas.md",
+    "CursoTableau",
     "Maching Learning/Regresión logística.md",
     "Maching Learning/Introducción.md",
     "Bienvenido.md",
