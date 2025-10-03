@@ -1,7 +1,7 @@
 # Vamos a cargar y limpiar un dataset
 
 # 1. Cargar el dataset
-datos <- read.csv("D:/MCPI/Análisis_De_Datos/AnalisisDeDatos_Project/DatosTitanic_SinLimpiar.csv")
+datos <- read.csv("D:/MCPI/Análisis_De_Datos/AnalisisDeDatos_Project/Datasets/DatosTitanic_SinLimpiar.csv")
 
 # 2. Limpiar el dataset
 sum(is.na(datos$Id))
@@ -25,6 +25,79 @@ sum(is.na(datos_limpios$Ticket))
 sum(is.na(datos_limpios$Tarifa))
 sum(is.na(datos_limpios$Cabina))
 sum(is.na(datos_limpios$PuertoEmb))
+
+##### Etapa de Analis Univariado
+# 1. Generar Estadisticos 
+# Desviacion Estandar: Que Tenga > 0
+# Varianza: Que tenga > 0 
+# Rango dinamico (max-min): Buscar valores atipicos (Que esten dentro de un criterio) 
+# Ejemplo si estamos detectando Diabetes y la columna
+# Glucosa nosotros esperamos que las personas tengan valores de 50 - 500
+
+# Ojo, solo se hace en las caracteristicas de entrada no en las de salida
+sd(datos_limpios$Pclase) # Desviacion estandar ->  0.8382499
+var(datos_limpios$Pclase) # Varianza -> 0.7026628
+range(datos_limpios$Pclase) # Rango Dinamico -> 1-3 = 2
+max(datos_limpios$Pclase) - min(datos_limpios$Pclase) # 2
+
+# Variable Sexo (No aplica es texto)
+
+# Edad:
+sd(datos_limpios$Edad) # 14.5265
+var(datos_limpios$Edad) # 211.0191
+max(datos_limpios$Edad) - min(datos_limpios$Edad) # 79.58
+
+# HermaConyu
+sd(datos_limpios$HermaConyu) # 0.9297835
+var(datos_limpios$HermaConyu) # 0.8644973
+max(datos_limpios$HermaConyu) - min(datos_limpios$HermaConyu) # 5
+
+# PadresHijos
+sd(datos_limpios$PadresHijos) # 0.8532894
+var(datos_limpios$PadresHijos) # 0.7281027
+max(datos_limpios$PadresHijos) - min(datos_limpios$PadresHijos) # 6
+
+# Tarifa
+sd(datos_limpios$Tarifa) # 52.91893
+var(datos_limpios$Tarifa) # 2800.413
+max(datos_limpios$Tarifa) - min(datos_limpios$Tarifa) # 512.3292
+
+#### Ahora ML: 
+modelo <- glm(Vivio ~ Tarifa, family = "binomial", data = datos_limpios)
+
+summary(modelo)
+# p-valor:
+# Pclase -> 2e-16 ***
+# Sexo -> 2e-16 ***
+# Edad -> 0.03 97 *
+# HermaConyu -> 0.643    
+# PadresHijos -> 0.0142 *
+# Tarifa -> 1.61e-10 ***ç
+
+# Prediciones:
+predicciones <- predict(modelo, newdata = datos_limpios, type = "response") 
+predicciones[1:10]
+
+# Construir la tabla
+tablita <- data.frame(Original = datos_limpios$Vivio, 
+                      prediccionesIA = predicciones)
+
+# Binarizar pero de forma vectorial:   
+tablita$prediccionesIA[tablita$prediccionesIA < 0.5] <- 0
+tablita$prediccionesIA[tablita$prediccionesIA >= 0.5] <- 1
+
+# Calcular el accuracy
+accuracy <- sum(tablita$Original == tablita$prediccionesIA)/nrow(tablita)
+accuracy
+# Variables:
+# Pcalse -> 0.67507 
+# Sexo -> 0.780112 (La variable sexo por si sola nos podria detectar cerca del 80%)
+# Edad -> 0.5938375
+# HermaConyu -> 0.5938375   
+# PadresHijos -> 0.5840336
+# Tarifa -> 0.6694678
+
+#### Fin de Analisi Univariados
 
 # False = 0, True = 1
 
@@ -83,8 +156,11 @@ accuracy
 
 # Vamos a probarlo 
 # Cargar datos:
-DatosCalamarMCPI <- read.csv("D:/MCPI/Análisis_De_Datos/AnalisisDeDatos_Project/DatosCalamarMCPI.csv")
+DatosCalamarMCPI <- read.csv("D:/MCPI/Análisis_De_Datos/AnalisisDeDatos_Project/Datasets/DatosCalamarMCPI.csv")
 
 # Obtener predicciones:
 prediccionesMCPI <- predict(modelo, newdata = DatosCalamarMCPI, type = "response") 
 prediccionesMCPI
+
+
+

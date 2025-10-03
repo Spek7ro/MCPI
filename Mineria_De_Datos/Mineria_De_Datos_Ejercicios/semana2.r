@@ -17,11 +17,11 @@ boxplot(AO)# Aparantemente 3 out, mayores a 100
 summary(AO)
 quantile(AO)
 boxplot(AO, horizontal = TRUE, col = "green", main = "Arsénico en Orina", xlab="Microgramos/L")
-######
+###############
 #
-# Agua
+# Arsenico en el Agua
 #
-######
+##########3
 AA = c(36.78,	48.5,	39.42,	24.45,	32.15,	40.46,	43.68,	43.01,	39.2,	39.79,	42.3,	46.63,	44.39,	35.58,	39.2,	38.28,	43.34,	36.69,	41.78)
 mean(AA) #39.77 <- Casi 4 veces el límite internacional
 median(AA) #39.79 <- No existen datos atípicos
@@ -50,5 +50,34 @@ skewness(AA)
 boxplot(AA, horizontal = TRUE)
 
 # Histogramas 
-hist(AO)
-hist(AA)
+hist(AO, breaks = 15)
+hist(AA, breaks = 15)
+
+# Cuarto momento (Curtosis)
+kurtosis(AO) # -> Negativa -0.5527793
+kurtosis(AA) # -> Positiva 1.193106
+
+
+# Funcion 
+plotn <- function(x,main="Histograma de frecuencias \ny distribución normal",
+                  xlab="X",ylab="Densidad") {
+  min <- min(x)
+  max <- max(x)
+  media <- mean(x)
+  dt <- sd(x)
+  hist(x,freq=F,main=main,xlab=xlab,ylab=ylab)
+  curve(dnorm(x,media,dt), min, max,add = T,col="red") # Genera una curva de distribucion normal
+}
+
+plotn(AO)
+plotn(AA)
+
+
+#######################
+#
+# Correlacion 
+#
+######################
+cor.test(AO,AA) # 0.3119695 
+cor.test(AA, AO)  
+
