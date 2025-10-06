@@ -1,6 +1,12 @@
 ### Artículo Propuesta – Primer Semestre de Maestría (MCPI):
 **“Análisis exploratorio de datos clínicos y sociodemográficos en pacientes con diagnóstico de preeclampsia en Zacatecas”** 
 
+#### Asesores: 
+1. Dr. Carlos E Galván-Tejada
+2. Dra. Vanessa Alcalá-Rmz.
+3. Dr. Sodel Vázquez-Reyes.
+4. Dra. Alejandra García Hernández
+5. xxx otro mas 
 ### Cronograma de trabajo (Primer semestre):
 | Semana | Actividad principal                                                                                   | Entregable                               |
 | ------ | ----------------------------------------------------------------------------------------------------- | ---------------------------------------- |
@@ -19,7 +25,7 @@
 | **13** | Redacción de Discusión y Conclusiones.                                                                | Artículo casi completo.                  |
 | **14** | Revisión de estilo y formato según revista/congreso.                                                  | Versión candidata del artículo.          |
 | **15** | Revisión con asesor/director de tesis.                                                                | Comentarios y mejoras.                   |
-| **16** | Entrega del artículo corto + dataset limpio final.                                                    | ✅ Entregables completos.                 |
+| **16** | Entrega del artículo corto + dataset limpio final.                                                    | Entregables completos.                   |
 
 📌 Con este plan, al finalizar el semestre obtendré: 
 - Dataset limpio y documentado en CSV.

@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "AnalisisDeDatos/Fases.md",
+                "file": "Tesis/Plan Tesis.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Fases"
+              "title": "Plan Tesis"
             }
           }
         ]
@@ -171,8 +171,8 @@
   },
   "active": "3ceac2fbf12f70d1",
   "lastOpenFiles": [
-    "Tesis/Plan Tesis.md",
     "AnalisisDeDatos/Fases.md",
+    "Tesis/Plan Tesis.md",
     "AnalisisDeDatos",
     "CursoTableau/Dimensiones y Medidas.md",
     "Tesis",
