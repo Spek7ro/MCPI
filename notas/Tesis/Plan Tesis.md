@@ -3,10 +3,10 @@
 
 #### Asesores: 
 1. Dr. Carlos E Galván-Tejada
-2. Dra. Vanessa Alcalá-Rmz.
+2. Dra. Vanessa Alcalá-Rmz. (Horario cO URIEL)
 3. Dr. Sodel Vázquez-Reyes.
 4. Dra. Alejandra García Hernández
-5. xxx otro mas 
+5. Dra. Margarita martinez fierro y Dra. Idalia Garza Veloz  (molecular)
 ### Cronograma de trabajo (Primer semestre):
 | Semana | Actividad principal                                                                                   | Entregable                               |
 | ------ | ----------------------------------------------------------------------------------------------------- | ---------------------------------------- |

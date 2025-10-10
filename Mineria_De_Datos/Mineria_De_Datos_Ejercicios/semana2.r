@@ -72,7 +72,6 @@ plotn <- function(x,main="Histograma de frecuencias \ny distribución normal",
 plotn(AO)
 plotn(AA)
 
-
 #######################
 #
 # Correlacion 
@@ -80,4 +79,31 @@ plotn(AA)
 ######################
 cor.test(AO,AA) # 0.3119695 
 cor.test(AA, AO)  
+
+## Prueba de Shapiro-Wilk (Se usa en muestras pequeñas < 50 muestras)
+## H0 (Hipotesis Nula): los datos siguen una distribucion normal p-valor > 5
+## H1 (Hipotesis Alternativa): los datos no siguen una distribucion normal p-valor < 5
+## W debe de estar ceraca de 1
+shapiro.test(AO) # No es normal
+shapiro.test(AA) # Es Normal
+
+plot(AA, type = "o", col="blue", pch = "o", lty=1, 
+     ylim = c(0,120))
+lines(AO, type = "o", col="green", pch="o")
+
+## Correlacion de Spearman
+cor.test(AO, AA, method = "spearman")
+
+# Graficar
+tsh = c(7.47, 2.64, -2.49, 0.31, 7.47, 6.64, 13.49, 2.64, 14.45, 7.27, 17.31, 3.45, 0.57, 7.84, 7.08,	1.25,	6.69,	0.64,	1.06)
+shapiro.test(tsh)
+
+hist(tsh)
+plotn(tsh)
+
+library(corrplot)
+
+datosA <- cbind.data.frame(AA, AO, tsh)
+par(mfrow=c(1,2))
+corrplot(cor(datosA, method = "pearson"), method = "pie")
 

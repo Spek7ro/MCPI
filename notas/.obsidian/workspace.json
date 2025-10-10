@@ -4,11 +4,11 @@
     "type": "split",
     "children": [
       {
-        "id": "fab98b1d664159cc",
+        "id": "173bbb14fa1da491",
         "type": "tabs",
         "children": [
           {
-            "id": "3ceac2fbf12f70d1",
+            "id": "006c158d6842042d",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -78,7 +78,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 229.5
+    "width": 229.5,
+    "collapsed": true
   },
   "right": {
     "id": "2af6031879ab36f9",
@@ -169,10 +170,17 @@
       "command-palette:Abrir paleta de comandos": false
     }
   },
-  "active": "3ceac2fbf12f70d1",
+  "active": "006c158d6842042d",
   "lastOpenFiles": [
-    "AnalisisDeDatos/Fases.md",
+    "Sin título.base",
     "Tesis/Plan Tesis.md",
+    "Pasted image 20251008121855.png",
+    "Maching Learning/Redes Neuronales.md",
+    "Pasted image 20251008122405.png",
+    "Pasted image 20251008122329.png",
+    "Pasted image 20251008122256.png",
+    "Sin título 1.base",
+    "AnalisisDeDatos/Fases.md",
     "AnalisisDeDatos",
     "CursoTableau/Dimensiones y Medidas.md",
     "Tesis",
