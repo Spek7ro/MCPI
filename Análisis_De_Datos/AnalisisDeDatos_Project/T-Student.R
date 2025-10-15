@@ -5,7 +5,7 @@ Dgo <- c(6.5, 7.2, 7.0, 6.8, 6.3, 7.1, 6.9, 6.4, 7.3, 6.7, 6.8, 6.6)
 mean(Zac)
 mean(Dgo)
 
-# Desviaciones estandra
+# Desviaciones estandr
 sd(Zac)
 sd(Dgo)
 
