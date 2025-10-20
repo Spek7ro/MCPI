@@ -64,6 +64,85 @@ dwtest(modelo)
 ## Si p-value > 0.05 → no se rechaza H₀ → los residuos son independientes. 
 ## Si p-value < 0.05 → hay autocorrelación → no cumple el supuesto.
 
+# SUPUESTOS 3 Y 4: HOMOSCEDASTICIDAD Y NORMALIDAD DE LOS RESIDUOS
+# # Obtener valores ajustados y residuos
+residuos <- residuals(modelo)
+predichos <- fitted(modelo)
+
+# Gráfico de dispersión: residuos vs valores ajustados
+library(ggplot2)
+ggplot(data.frame(predichos, residuos), aes(x = predichos, y = residuos)) +
+  geom_point(color = "steelblue") +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Supuesto de Homoscedasticidad",
+       x = "Valores ajustados",
+       y = "Residuos") +
+  theme_minimal(base_size = 12)
+
+# Prueba de correlación entre residuos y predichos
+cor_test <- cor.test(predichos, residuos, method = "spearman")
+print(cor_test)
+
+# Interpretación:
+# H0: No hay correlación → Homoscedasticidad (varianza constante)
+# H1: Sí hay correlación → Heterocedasticidad (varianza no constante)
+
+if (cor_test$p.value > 0.05) {
+  cat("No hay correlación significativa: Se cumple el supuesto de homoscedasticidad.\n")
+} else {
+  cat("Existe correlación: Se viola el supuesto de homoscedasticidad.\n")
+}
+
+ggsave("graficas_linealidad/homoscedasticidad.png", width = 7, height = 5, dpi = 300)
+
+# SUPUESTO DE NORMALIDAD DE LOS RESIDUOS
+
+# Histograma de los residuos
+ggplot(data.frame(residuos), aes(x = residuos)) +
+  geom_histogram(aes(y = ..density..), bins = 20, fill = "green", color = "black") +
+  geom_density(color = "red") +
+  labs(title = "Histograma de los residuos",
+       x = "Residuos", y = "Densidad") +
+  theme_minimal(base_size = 12)
+ggsave("graficas_linealidad/histograma_residuos.png", width = 7, height = 5, dpi = 300)
+
+# Gráfico Q–Q (Quantile–Quantile)
+qqnorm(residuos, main = "Gráfico Q–Q de los residuos")
+qqline(residuos, col = "red", lwd = 2)
+dev.copy(png, "graficas_linealidad/qqplot_residuos.png", width = 700, height = 500)
+dev.off()
+
+# Gráfico P–P (Probabilidad–Probabilidad)
+# Usando función acumulada normal teórica vs empírica
+residuos_std <- (residuos - mean(residuos)) / sd(residuos)
+pp_data <- data.frame(
+  emp = ppoints(length(residuos)),
+  theor = pnorm(sort(residuos_std))
+)
+ggplot(pp_data, aes(x = theor, y = emp)) +
+  geom_point(color = "steelblue") +
+  geom_abline(slope = 1, intercept = 0, color = "red") +
+  labs(title = "Gráfico P–P de los residuos",
+       x = "Probabilidad teórica", y = "Probabilidad empírica") +
+  theme_minimal(base_size = 12)
+ggsave("graficas_linealidad/ppplot_residuos.png", width = 7, height = 5, dpi = 300)
+
+# Prueba de normalidad de Kolmogorov–Smirnov
+ks_result <- ks.test(residuos_std, "pnorm")
+print(ks_result)
+
+# Interpretación:
+# H0: Los residuos se distribuyen normalmente
+# H1: Los residuos no se distribuyen normalmente
+
+if (ks_result$p.value > 0.05) {
+  cat("P-value > 0.05: Los residuos siguen una distribución normal.\n")
+} else {
+  cat("p-value < 0.05: Los residuos NO siguen una distribución normal.\n")
+}
+
+
+# Graficos en uno
 par(mfrow = c(2, 2))
 plot(modelo)
 par(mfrow = c(1, 1))
