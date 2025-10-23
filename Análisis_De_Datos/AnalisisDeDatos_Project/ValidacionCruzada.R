@@ -17,7 +17,7 @@ indices = createFolds(y = datos_limpios$Vivio, k = 3,
             returnTrain = TRUE,
             list = TRUE)
 
-# Validacion Cruzada K = 1
+###### Validacion Cruzada K = 1 #######
 datos_Fold_Entrenaminto <- datos_limpios[indices$Fold1, ]
 datos_Fold_Prueba <- datos_limpios[-indices$Fold1, ] # todos menos los del los inices
 
@@ -33,6 +33,21 @@ predicciones <- predict(modeloX, newdata = datos_Fold_Entrenaminto,
 # Construir la tabla
 tablitaX <- data.frame(Original = datos_Fold_Entrenaminto$Vivio, 
                       prediccionesModelo = predicciones)
+
+#### Calcular Curva ROC
+library(pROC)
+mi_curva <- roc(tablitaX$Original, tablitaX$prediccionesModelo,
+                 levels=c(0,1), plot=TRUE, ci=TRUE,
+                 smooth=FALSE, direction='auto',
+                 col='red', main="Grafica ROC")
+
+### Area bajo la curva
+mi_curva$auc # 0.7932 AUC
+mi_curva
+
+#### Obtenemos los valores de Threshold (umbral binarizacion)
+valores <- coords(mi_curva, "best", ret="threshold")
+valores$threshold
 
 # Binarizar pero de forma vectorial:   
 tablitaX$prediccionesModelo[tablitaX$prediccionesModelo < 0.5] <- 0
