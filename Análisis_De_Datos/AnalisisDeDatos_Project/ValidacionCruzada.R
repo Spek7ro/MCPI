@@ -39,24 +39,23 @@ library(pROC)
 mi_curva <- roc(tablitaX$Original, tablitaX$prediccionesModelo,
                  levels=c(0,1), plot=TRUE, ci=TRUE,
                  smooth=FALSE, direction='auto',
-                 col='red', main="Grafica ROC")
+                 col='red', main="Grafica ROC -  Entrenaminto K=1")
 
 ### Area bajo la curva
-mi_curva$auc # 0.7932 AUC
+mi_curva$auc # 0.7623 AUC
 mi_curva
 
 #### Obtenemos los valores de Threshold (umbral binarizacion)
-valores <- coords(mi_curva, "best", ret="threshold")
-valores$threshold
+valores <- coords(mi_curva, "best", ret=c("threshold", "specificity", "sensitivity"))
+valores
 
 # Binarizar pero de forma vectorial:   
-tablitaX$prediccionesModelo[tablitaX$prediccionesModelo < 0.5] <- 0
-tablitaX$prediccionesModelo[tablitaX$prediccionesModelo >= 0.5] <- 1
+tablitaX$prediccionesModelo[tablitaX$prediccionesModelo < valores$threshold] <- 0
+tablitaX$prediccionesModelo[tablitaX$prediccionesModelo >= valores$threshold] <- 1
 
 # Calcular el accuracy de entrenaminto 
 accuracy <- sum(tablitaX$Original == tablitaX$prediccionesModelo)/nrow(tablitaX)
-accuracy # 0.789916
-
+accuracy # 0.7815126
 
 ######## Ahora para VALIDACION K = 1 ########
 predicciones <- predict(modeloX, newdata = datos_Fold_Prueba,
@@ -65,13 +64,28 @@ predicciones <- predict(modeloX, newdata = datos_Fold_Prueba,
 tablitaX <- data.frame(Original = datos_Fold_Prueba$Vivio, 
                        prediccionesModelo = predicciones)
 
-tablitaX$prediccionesModelo[tablitaX$prediccionesModelo < 0.5] <- 0
-tablitaX$prediccionesModelo[tablitaX$prediccionesModelo >= 0.5] <- 1
+#### Calcular Curva ROC
+library(pROC)
+mi_curva <- roc(tablitaX$Original, tablitaX$prediccionesModelo,
+                levels=c(0,1), plot=TRUE, ci=TRUE,
+                smooth=FALSE, direction='auto',
+                col='green', main="Grafica ROC - Prueba K=1")
+
+### Area bajo la curva
+mi_curva$auc # 0.7938 AUC
+mi_curva
+
+#### Obtenemos los valores de Threshold (umbral binarizacion)
+valores <- coords(mi_curva, "best", ret=c("threshold", "specificity", "sensitivity"))
+valores
+
+tablitaX$prediccionesModelo[tablitaX$prediccionesModelo < valores$threshold] <- 0
+tablitaX$prediccionesModelo[tablitaX$prediccionesModelo >= valores$threshold] <- 1
 
 accuracy <- sum(tablitaX$Original == tablitaX$prediccionesModelo)/nrow(tablitaX)
-accuracy # 0.7605042
+accuracy # 0.8109244
 
-######################
+##########################
 # Validacion Cruzada K = 2
 datos_Fold_Entrenaminto <- datos_limpios[indices$Fold2, ]
 datos_Fold_Prueba <- datos_limpios[-indices$Fold2, ] # todos menos los del los inices
@@ -84,19 +98,32 @@ modeloX <- glm(Vivio ~ Sexo + Edad,
 # Metricas Entrenaminto 
 predicciones <- predict(modeloX, newdata = datos_Fold_Entrenaminto,
                         type = "response")
-
 # Construir la tabla
 tablitaX <- data.frame(Original = datos_Fold_Entrenaminto$Vivio, 
                        prediccionesModelo = predicciones)
 
+#### Calcular Curva ROC
+library(pROC)
+mi_curva <- roc(tablitaX$Original, tablitaX$prediccionesModelo,
+                levels=c(0,1), plot=TRUE, ci=TRUE,
+                smooth=FALSE, direction='auto',
+                col='red', main="Grafica ROC - Entrenamiento K=2")
+
+### Area bajo la curva
+mi_curva$auc # 0.7962 AUC
+mi_curva
+
+#### Obtenemos los valores de Threshold (umbral binarizacion)
+valores <- coords(mi_curva, "best", ret=c("threshold", "specificity", "sensitivity"))
+valores
+
 # Binarizar pero de forma vectorial:   
-tablitaX$prediccionesModelo[tablitaX$prediccionesModelo < 0.5] <- 0
-tablitaX$prediccionesModelo[tablitaX$prediccionesModelo >= 0.5] <- 1
+tablitaX$prediccionesModelo[tablitaX$prediccionesModelo < valores$threshold] <- 0
+tablitaX$prediccionesModelo[tablitaX$prediccionesModelo >= valores$threshold] <- 1
 
 # Calcular el accuracy de entrenaminto 
 accuracy <- sum(tablitaX$Original == tablitaX$prediccionesModelo)/nrow(tablitaX)
-accuracy # 0.7941176
-
+accuracy # 0.8046218
 
 ######## Ahora para VALIDACION K = 2 ########
 predicciones <- predict(modeloX, newdata = datos_Fold_Prueba,
@@ -104,12 +131,26 @@ predicciones <- predict(modeloX, newdata = datos_Fold_Prueba,
 
 tablitaX <- data.frame(Original = datos_Fold_Prueba$Vivio, 
                        prediccionesModelo = predicciones)
+#### Calcular Curva ROC
+library(pROC)
+mi_curva <- roc(tablitaX$Original, tablitaX$prediccionesModelo,
+                levels=c(0,1), plot=TRUE, ci=TRUE,
+                smooth=FALSE, direction='auto',
+                col='green', main="Grafica ROC - Prueba K=2")
 
-tablitaX$prediccionesModelo[tablitaX$prediccionesModelo < 0.5] <- 0
-tablitaX$prediccionesModelo[tablitaX$prediccionesModelo >= 0.5] <- 1
+### Area bajo la curva
+mi_curva$auc # 0.7929 AUC
+mi_curva
+
+#### Obtenemos los valores de Threshold (umbral binarizacion)
+valores <- coords(mi_curva, "best", ret=c("threshold", "specificity", "sensitivity"))
+valores
+
+tablitaX$prediccionesModelo[tablitaX$prediccionesModelo < valores$threshold] <- 0
+tablitaX$prediccionesModelo[tablitaX$prediccionesModelo >= valores$threshold] <- 1
 
 accuracy <- sum(tablitaX$Original == tablitaX$prediccionesModelo)/nrow(tablitaX)
-accuracy # 0.7521008
+accuracy # 0.7605042
 
 
 ######################
@@ -129,14 +170,28 @@ predicciones <- predict(modeloX, newdata = datos_Fold_Entrenaminto,
 # Construir la tabla
 tablitaX <- data.frame(Original = datos_Fold_Entrenaminto$Vivio, 
                        prediccionesModelo = predicciones)
+#### Calcular Curva ROC
+library(pROC)
+mi_curva <- roc(tablitaX$Original, tablitaX$prediccionesModelo,
+                levels=c(0,1), plot=TRUE, ci=TRUE,
+                smooth=FALSE, direction='auto',
+                col='red', main="Grafica ROC - Entrenamiento K=3")
+
+### Area bajo la curva
+mi_curva$auc # 0.7581 AUC
+mi_curva
+
+#### Obtenemos los valores de Threshold (umbral binarizacion)
+valores <- coords(mi_curva, "best", ret=c("threshold", "specificity", "sensitivity"))
+valores
 
 # Binarizar pero de forma vectorial:   
-tablitaX$prediccionesModelo[tablitaX$prediccionesModelo < 0.5] <- 0
-tablitaX$prediccionesModelo[tablitaX$prediccionesModelo >= 0.5] <- 1
+tablitaX$prediccionesModelo[tablitaX$prediccionesModelo < valores$threshold] <- 0
+tablitaX$prediccionesModelo[tablitaX$prediccionesModelo >= valores$threshold] <- 1
 
 # Calcular el accuracy de entrenaminto 
 accuracy <- sum(tablitaX$Original == tablitaX$prediccionesModelo)/nrow(tablitaX)
-accuracy # 0.7563025
+accuracy # 0.7836134
 
 
 ######## Ahora para VALIDACION K = 3 ########
@@ -146,11 +201,26 @@ predicciones <- predict(modeloX, newdata = datos_Fold_Prueba,
 tablitaX <- data.frame(Original = datos_Fold_Prueba$Vivio, 
                        prediccionesModelo = predicciones)
 
-tablitaX$prediccionesModelo[tablitaX$prediccionesModelo < 0.5] <- 0
-tablitaX$prediccionesModelo[tablitaX$prediccionesModelo >= 0.5] <- 1
+#### Calcular Curva ROC
+library(pROC)
+mi_curva <- roc(tablitaX$Original, tablitaX$prediccionesModelo,
+                levels=c(0,1), plot=TRUE, ci=TRUE,
+                smooth=FALSE, direction='auto',
+                col='green', main="Grafica ROC - Prueba K=3")
+
+### Area bajo la curva
+mi_curva$auc # 0.7973 AUC
+mi_curva
+
+#### Obtenemos los valores de Threshold (umbral binarizacion)
+valores <- coords(mi_curva, "best", ret=c("threshold", "specificity", "sensitivity"))
+valores
+
+tablitaX$prediccionesModelo[tablitaX$prediccionesModelo < valores$threshold] <- 0
+tablitaX$prediccionesModelo[tablitaX$prediccionesModelo >= valores$threshold] <- 1
 
 accuracy <- sum(tablitaX$Original == tablitaX$prediccionesModelo)/nrow(tablitaX)
-accuracy # 0.8277311
+accuracy # 0.802521
 
 
 

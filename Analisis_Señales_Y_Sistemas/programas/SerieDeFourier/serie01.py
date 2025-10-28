@@ -8,7 +8,7 @@ n_values = [1, 3, 5, 7, 9, 11]
 A = 4 / np.pi 
 
 fig, axs = plt.subplots(3, 2, figsize=(15, 15))
-plt.subplots_adjust(hspace=0.4, wspace=0.4) # espaciado entre subplots
+plt.subplots_adjust(hspace=0.4, wspace=0.4) 
 
 f_t_aproximacion = np.zeros_like(t)
 
