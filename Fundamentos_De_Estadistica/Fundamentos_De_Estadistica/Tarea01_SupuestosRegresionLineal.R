@@ -147,3 +147,45 @@ par(mfrow = c(2, 2))
 plot(modelo)
 par(mfrow = c(1, 1))
 
+# Calcular la matriz de correlación
+sapply(cereal, class)
+library(corrplot)
+
+# Selecciona solo las columnas que te interesan
+vars_interes <- c(
+  "Rating.of.cereal",
+  "calories.per.serving",
+  "grams.of.protein",
+  "milligrams.of.sodium",
+  "grams.of.dietary.fiber",
+  "grams.of.complex.carbohydrates",
+  "grams.of.sugars",
+  "milligrams.of.potassium"
+)
+
+# Filtrar las columnas del dataframe
+cereal_sel <- cereal[, vars_interes]
+
+# Calcular la matriz de correlación
+matriz_cor <- cor(cereal_sel, method = "pearson")
+
+# Mostrar la matriz
+print(round(matriz_cor, 2))
+
+# Mapa de correlación tipo círculo
+corrplot(matriz_cor, method = "circle")
+
+library(ggcorrplot)
+ggcorrplot(matriz_cor,
+           hc.order = TRUE,
+           type = "lower",
+           lab = TRUE,
+           colors = c("red", "white", "blue"),
+           title = "Mapa de correlaciones del cereal",
+           ggtheme = ggplot2::theme_minimal)
+
+
+# R^2: coeficinte de determinacion 0.4752  
+modelo2 <- lm(Rating.of.cereal ~ calories.per.serving, data = cereal)
+summary(modelo2)
+plot(modelo2)
