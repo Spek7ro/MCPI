@@ -2,7 +2,6 @@ import numpy as np
 from scipy.integrate import quad
 import matplotlib.pyplot as plt
 
-
 def calcular_coeficientes_fourier(f, T, N_max, t1=0):
     
     # Frecuencia angular fundamental omega_0 = 2*pi / T

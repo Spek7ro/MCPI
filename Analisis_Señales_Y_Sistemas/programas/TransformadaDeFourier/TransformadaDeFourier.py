@@ -7,16 +7,9 @@ A = 1.0
 tau = 1.0
 
 def pulso_rectangular(t, A, tau):
-    """Define el pulso rectangular f(t) con amplitud A y duración tau."""
-    return np.where(np.abs(t) <= tau / 2, A, 0.0)
+    return np.where(np.abs(t) <= tau / 2.0, A, 0.0)
 
 def transformada_fourier_rect(omega, A, tau):
-    """
-    Define la Transformada de Fourier F(omega) del pulso rectangular.
-    F(omega) = A * tau * sinc(omega * tau / 2)
-    La función numpy.sinc(x) es sin(pi*x)/(pi*x), por lo que debemos ajustar los argumentos.
-    Usaremos la forma: F(omega) = A * tau * [sin(x) / x] donde x = omega * tau / 2
-    """
     x = omega * tau / 2.0
     sinc_no_normalizada = np.where(x != 0, np.sin(x) / x, 1.0)
     
@@ -24,8 +17,6 @@ def transformada_fourier_rect(omega, A, tau):
 
 # Dominio del tiempo (t) para el pulso
 t = np.linspace(-3 * tau, 3 * tau, 500)
-# Dominio de la frecuencia (omega = 2*pi*f) para la transformada
-# Se extiende lo suficiente para ver varios lóbulos de la función sinc.
 omega = np.linspace(-15 * np.pi, 15 * np.pi, 500)
 
 # Calcular las funciones
@@ -47,8 +38,6 @@ axs[0].grid(True, linestyle=':', alpha=0.6)
 
 axs[1].plot(omega, F_omega, 'r', linewidth=2, label=r'$F(\omega) = A\tau \cdot \text{sinc}(\omega\tau/2)$')
 
-# Marcar los ceros de la función sinc
-# Los ceros ocurren cuando omega * tau / 2 = n*pi, es decir, omega = 2*n*pi / tau
 cero_indices = np.arange(1, 5) * 2 * np.pi / tau
 for cero in cero_indices:
     axs[1].axvline(cero, color='gray', linestyle=':', linewidth=0.8)
